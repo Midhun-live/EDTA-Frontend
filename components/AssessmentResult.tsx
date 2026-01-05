@@ -1,23 +1,50 @@
 "use client";
 
 import { Label } from "./ui/label";
-import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
+
+/* ================= TYPES ================= */
+
+type Section = {
+  equipment?: string[] | number;
+  care_instructions?: string[] | number;
+};
 
 type Assessment = {
   assessment_id?: string;
   patient?: {
     name?: string;
     age?: number;
-    contact_number?: string;
     discharge_date?: string;
   };
   created_at?: string;
-  output?: {
-    equipment_recommended?: string[];
-    care_instructions?: string[];
-  };
+  output?: Record<string, Section>;
 };
+
+/* ================= HELPERS ================= */
+
+function formatDate(dateStr?: string) {
+  if (!dateStr) return "-";
+
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "-";
+
+  const day = date.getDate();
+  const suffix =
+    day % 10 === 1 && day !== 11
+      ? "st"
+      : day % 10 === 2 && day !== 12
+      ? "nd"
+      : day % 10 === 3 && day !== 13
+      ? "rd"
+      : "th";
+
+  return `${day}${suffix} ${date.toLocaleString("en-US", {
+    month: "long",
+  })} ${date.getFullYear()}`;
+}
+
+/* ================= MAIN ================= */
 
 export default function AssessmentResult({
   assessment,
@@ -25,111 +52,99 @@ export default function AssessmentResult({
   assessment: Assessment;
 }) {
   const patient = assessment.patient || {};
-  const equipment = assessment.output?.equipment_recommended || [];
-  const instructions = assessment.output?.care_instructions || [];
+  const output = assessment.output || {};
 
   return (
-    <div className="space-y-6">
-      {/* ===== SUMMARY HEADER ===== */}
-      <div className="flex items-center justify-between bg-slate-50 rounded-lg p-4 border">
-        <div>
-          <h3 className="text-lg font-semibold">
-            Assessment Summary
-          </h3>
-          <p className="text-xs text-muted-foreground">
-            Generated on{" "}
-            {assessment.created_at
-              ? new Date(assessment.created_at).toLocaleString()
-              : "-"}
-          </p>
-        </div>
-        <Badge variant="secondary">Completed</Badge>
-      </div>
+    <div className="space-y-8">
 
-      {/* ===== MAIN GRID ===== */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* PATIENT DETAILS */}
-        <div className="bg-white rounded-lg shadow-sm border p-5">
-          <Label className="text-sm font-semibold">
-            Patient Details
-          </Label>
-          <Separator className="my-3" />
+      {/* ================= PATIENT SUMMARY (PRIMARY) ================= */}
+      <div className="bg-white border-l-4 border-blue-600 rounded-xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold mb-4">
+          Patient Summary
+        </h2>
 
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Name</span>
-              <span className="font-medium">{patient.name || "-"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Age</span>
-              <span className="font-medium">{patient.age ?? "-"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Contact</span>
-              <span className="font-medium">
-                {patient.contact_number || "-"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Discharge</span>
-              <span className="font-medium">
-                {patient.discharge_date || "-"}
-              </span>
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
+          <div>
+            <p className="text-muted-foreground">Name</p>
+            <p className="font-medium text-base">
+              {patient.name || "-"}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-muted-foreground">Age</p>
+            <p className="font-medium">
+              {patient.age ? `${patient.age} years` : "-"}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-muted-foreground">Discharge Date</p>
+            <p className="font-medium">
+              {formatDate(patient.discharge_date)}
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* EQUIPMENT */}
-        <div className="bg-white rounded-lg shadow-sm border p-5">
-          <Label className="text-sm font-semibold">
-            Equipment Recommended
-          </Label>
-          <Separator className="my-3" />
+      {/* ================= CARE SECTIONS ================= */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {Object.entries(output).map(([sectionName, section]) => {
+          const equipment = Array.isArray(section.equipment)
+            ? section.equipment
+            : [];
 
-          {equipment.length ? (
-            <ul className="space-y-2 text-sm">
-              {equipment.map((item, i) => (
-                <li
-                  key={i}
-                  className="flex gap-2 items-center"
-                >
-                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              No equipment recommended
-            </p>
-          )}
-        </div>
+          const care = Array.isArray(section.care_instructions)
+            ? section.care_instructions
+            : [];
 
-        {/* CARE INSTRUCTIONS */}
-        <div className="bg-white rounded-lg shadow-sm border p-5">
-          <Label className="text-sm font-semibold">
-            Care Instructions
-          </Label>
-          <Separator className="my-3" />
+          if (!equipment.length && !care.length) return null;
 
-          {instructions.length ? (
-            <ul className="space-y-2 text-sm">
-              {instructions.map((inst, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-2"
-                >
-                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-blue-500" />
-                  <span>{inst}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              No specific instructions
-            </p>
-          )}
-        </div>
+          return (
+            <div
+              key={sectionName}
+              className="bg-white rounded-lg border shadow-sm p-5 space-y-4"
+            >
+              <Label className="text-sm font-semibold capitalize">
+                {sectionName.replace(/_/g, " ")}
+              </Label>
+
+              {equipment.length > 0 && (
+                <div>
+                  <Separator className="mb-2" />
+                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                    Equipment
+                  </p>
+                  <ul className="space-y-1 text-sm">
+                    {equipment.map((item, i) => (
+                      <li key={i} className="flex gap-2">
+                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {care.length > 0 && (
+                <div>
+                  <Separator className="mb-2" />
+                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                    Care Instructions
+                  </p>
+                  <ul className="space-y-1 text-sm">
+                    {care.map((inst, i) => (
+                      <li key={i} className="flex gap-2">
+                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-500" />
+                        <span>{inst}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -72,7 +72,7 @@ export default function DischargeAssessmentForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTk2ZTViMmItNDM5ZS00MWQ5LTgzOTQtMTM5Y2NjZDhlYjJiIiwicm9sZSI6Ik51cnNlIiwiZXhwIjoxNzY3NjA0OTkxfQ._B0Aa8nFrFHG14igyqkpXPSjsrzz63FPQ7FhJdnHEMs"
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWU4ZWJiMDgtM2FmNS00Mzg5LWEwMTEtNDliY2RlZTMwZmNlIiwicm9sZSI6Ik51cnNlIiwiZXhwIjoxNzY3NzA5MTE5fQ.jgYO0DxHj5p9W_ZyaiYoDNWlJFGmpICrgkiQbgO2M1c"
         },
         body: JSON.stringify(initialValues),
       }
