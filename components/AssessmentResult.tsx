@@ -1,151 +1,66 @@
 "use client";
 
-import { Label } from "./ui/label";
-import { Separator } from "./ui/separator";
+import jsPDF from "jspdf";
 
-/* ================= TYPES ================= */
-
-type Section = {
-  equipment?: string[] | number;
-  care_instructions?: string[] | number;
+type Props = {
+  result: any;
+  showActions?: boolean;
 };
-
-type Assessment = {
-  assessment_id?: string;
-  patient?: {
-    name?: string;
-    age?: number;
-    discharge_date?: string;
-  };
-  created_at?: string;
-  output?: Record<string, Section>;
-};
-
-/* ================= HELPERS ================= */
-
-function formatDate(dateStr?: string) {
-  if (!dateStr) return "-";
-
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return "-";
-
-  const day = date.getDate();
-  const suffix =
-    day % 10 === 1 && day !== 11
-      ? "st"
-      : day % 10 === 2 && day !== 12
-      ? "nd"
-      : day % 10 === 3 && day !== 13
-      ? "rd"
-      : "th";
-
-  return `${day}${suffix} ${date.toLocaleString("en-US", {
-    month: "long",
-  })} ${date.getFullYear()}`;
-}
-
-/* ================= MAIN ================= */
 
 export default function AssessmentResult({
-  assessment,
-}: {
-  assessment: Assessment;
-}) {
-  const patient = assessment.patient || {};
-  const output = assessment.output || {};
+  result,
+  showActions = true,
+}: Props) {
+  function shareLink() {
+    const encoded = encodeURIComponent(
+      btoa(JSON.stringify(result))
+    );
+
+    const url = `${window.location.origin}/share?data=${encoded}`;
+    navigator.clipboard.writeText(url);
+    alert("Shareable link copied");
+  }
+
+  function downloadPDF() {
+    const pdf = new jsPDF();
+    pdf.text("Discharge Assessment Result", 10, 15);
+
+    let y = 30;
+    Object.entries(result).forEach(([key, value]) => {
+      pdf.text(`${key}: ${JSON.stringify(value)}`, 10, y);
+      y += 8;
+    });
+
+    pdf.save("assessment.pdf");
+  }
 
   return (
-    <div className="space-y-8">
+    <div className="border rounded p-6 space-y-4">
+      <h3 className="text-xl font-semibold">
+        Assessment Result
+      </h3>
 
-      {/* ================= PATIENT SUMMARY (PRIMARY) ================= */}
-      <div className="bg-white border-l-4 border-blue-600 rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold mb-4">
-          Patient Summary
-        </h2>
+      <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
+        {JSON.stringify(result, null, 2)}
+      </pre>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
-          <div>
-            <p className="text-muted-foreground">Name</p>
-            <p className="font-medium text-base">
-              {patient.name || "-"}
-            </p>
-          </div>
+      {showActions && (
+        <div className="flex gap-4">
+          <button
+            onClick={shareLink}
+            className="px-4 py-2 border rounded"
+          >
+            Share Link
+          </button>
 
-          <div>
-            <p className="text-muted-foreground">Age</p>
-            <p className="font-medium">
-              {patient.age ? `${patient.age} years` : "-"}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-muted-foreground">Discharge Date</p>
-            <p className="font-medium">
-              {formatDate(patient.discharge_date)}
-            </p>
-          </div>
+          <button
+            onClick={downloadPDF}
+            className="px-4 py-2 border rounded"
+          >
+            Download PDF
+          </button>
         </div>
-      </div>
-
-      {/* ================= CARE SECTIONS ================= */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {Object.entries(output).map(([sectionName, section]) => {
-          const equipment = Array.isArray(section.equipment)
-            ? section.equipment
-            : [];
-
-          const care = Array.isArray(section.care_instructions)
-            ? section.care_instructions
-            : [];
-
-          if (!equipment.length && !care.length) return null;
-
-          return (
-            <div
-              key={sectionName}
-              className="bg-white rounded-lg border shadow-sm p-5 space-y-4"
-            >
-              <Label className="text-sm font-semibold capitalize">
-                {sectionName.replace(/_/g, " ")}
-              </Label>
-
-              {equipment.length > 0 && (
-                <div>
-                  <Separator className="mb-2" />
-                  <p className="text-xs font-medium text-muted-foreground mb-1">
-                    Equipment
-                  </p>
-                  <ul className="space-y-1 text-sm">
-                    {equipment.map((item, i) => (
-                      <li key={i} className="flex gap-2">
-                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {care.length > 0 && (
-                <div>
-                  <Separator className="mb-2" />
-                  <p className="text-xs font-medium text-muted-foreground mb-1">
-                    Care Instructions
-                  </p>
-                  <ul className="space-y-1 text-sm">
-                    {care.map((inst, i) => (
-                      <li key={i} className="flex gap-2">
-                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-500" />
-                        <span>{inst}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      )}
     </div>
   );
 }

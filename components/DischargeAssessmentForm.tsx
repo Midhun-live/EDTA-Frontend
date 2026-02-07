@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Input } from "./ui/input";
+import { apiFetch } from "@/lib/api";
 import {
   Select,
   SelectContent,
@@ -62,23 +63,20 @@ export default function DischargeAssessmentForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = {
-      initialValues,
-    };
-    console.log("Payload:", payload);
-    const response = await fetch(
-      `http://127.0.0.1:8000/assessments`,
-      {
+
+    console.log("Payload:", initialValues);
+
+    try {
+      const response = await apiFetch("/assessments", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWU4ZWJiMDgtM2FmNS00Mzg5LWEwMTEtNDliY2RlZTMwZmNlIiwicm9sZSI6Ik51cnNlIiwiZXhwIjoxNzY3NzA5MTE5fQ.jgYO0DxHj5p9W_ZyaiYoDNWlJFGmpICrgkiQbgO2M1c"
-        },
         body: JSON.stringify(initialValues),
-      }
-    );
-    setResult(await response.json());
-    console.log("response", response);
+      });
+
+      setResult(response);
+      console.log("response", response);
+    } catch (error) {
+      console.error("Assessment submission failed:", error);
+    }
   };
 
   return (
@@ -701,7 +699,7 @@ export default function DischargeAssessmentForm() {
       }
       {result && (
         <div className="mt-8">
-          <AssessmentResult assessment={result} />
+          <AssessmentResult result={result} />
         </div>
       )}
     </div>
