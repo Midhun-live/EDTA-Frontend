@@ -63,12 +63,21 @@ export default function AssessmentResult({
   /* ================= ACTIONS ================= */
 
   function shareLink() {
-    if (!assessment.assessment_id) {
-      alert("Unable to generate share link");
-      return;
-    }
+    const shareId = crypto.randomUUID().slice(0, 8);
 
-    const url = `${window.location.origin}/share/assessment/${assessment.assessment_id}`;
+    const payload = {
+      assessment_id: assessment.assessment_id,
+      patient: assessment.patient,
+      created_at: assessment.created_at,
+      output: assessment.output,
+    };
+
+    localStorage.setItem(
+      `shared_assessment_${shareId}`,
+      JSON.stringify(payload)
+    );
+
+    const url = `${window.location.origin}/share?id=${shareId}`;
     navigator.clipboard.writeText(url);
     alert("Shareable link copied");
   }
