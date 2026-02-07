@@ -1,31 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import DischargeAssessmentForm from "@/components/DischargeAssessmentForm";
-import AssessmentResult from "@/components/AssessmentResult";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
-export default function HomePage() {
-  const [result, setResult] = useState<any>(null);
-  const [showForm, setShowForm] = useState(false);
+export default function DashboardPage() {
+  const router = useRouter();
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {!showForm && !result && (
-        <button onClick={() => setShowForm(true)}>
-          Start Assessment
-        </button>
-      )}
+    <div className="min-h-screen p-10 bg-sky-50">
+      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-      {showForm && !result && (
-        <DischargeAssessmentForm
-          onSuccess={(data: any) => {
-            setResult(data);
-            setShowForm(false);
-          }}
-        />
-      )}
-
-      {result && <AssessmentResult result={result} />}
+      <Button
+        onClick={() => router.push("/form")}
+        className="bg-sky-600 hover:bg-sky-700"
+      >
+        Open Form
+      </Button>
     </div>
   );
 }

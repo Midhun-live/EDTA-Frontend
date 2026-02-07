@@ -73,7 +73,7 @@ export default function DischargeAssessmentForm() {
       });
 
       setResult(response);
-      console.log("response", response);
+    console.log("response", response);
     } catch (error) {
       console.error("Assessment submission failed:", error);
     }
@@ -699,7 +699,7 @@ export default function DischargeAssessmentForm() {
       }
       {result && (
         <div className="mt-8">
-          <AssessmentResult result={result} />
+          <AssessmentResult assessment={result} />
         </div>
       )}
     </div>

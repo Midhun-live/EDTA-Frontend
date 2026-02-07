@@ -1,26 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { login } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import LoginForm from "@/components/auth/LoginForm";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const handleLogin = () => {
-    if (!login(email, password)) {
-      setError("Invalid email or password");
-      return;
-    }
-    router.push("/dashboard");
-  };
-
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
       {/* LEFT */}
@@ -42,44 +24,15 @@ export default function LoginPage() {
             Welcome back to Eldersmiles
           </p>
 
-          <div className="space-y-4">
-            <div>
-              <Label>Email</Label>
-              <Input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="doctor@eldersmiles.com"
-              />
-            </div>
+          {/* ✅ REAL LOGIN */}
+          <LoginForm />
 
-            <div>
-              <Label>Password</Label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="password123"
-              />
-            </div>
-
-            {error && (
-              <p className="text-sm text-red-500">{error}</p>
-            )}
-
-            <Button
-              onClick={handleLogin}
-              className="w-full bg-sky-600 hover:bg-sky-700"
-            >
-              Login
-            </Button>
-
-            <p className="text-center text-sm text-muted-foreground">
-              Don’t have an account?{" "}
-              <a href="/signup" className="text-sky-600 font-medium">
-                Sign up
-              </a>
-            </p>
-          </div>
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Don’t have an account?{" "}
+            <a href="/signup" className="text-sky-600 font-medium">
+              Sign up
+            </a>
+          </p>
         </div>
       </div>
     </div>

@@ -1,13 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import SignupForm from "@/components/auth/SignupForm";
 
 export default function SignupPage() {
-  const router = useRouter();
-
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
       {/* LEFT */}
@@ -29,46 +24,15 @@ export default function SignupPage() {
             Join Eldersmiles today
           </p>
 
-          <div className="space-y-4">
-            <div>
-              <Label>Full Name</Label>
-              <Input placeholder="Dr. John Doe" />
-            </div>
+          {/* ✅ REAL SIGNUP FORM */}
+          <SignupForm />
 
-            <div>
-              <Label>Email</Label>
-              <Input placeholder="doctor@eldersmiles.com" />
-            </div>
-
-            <div>
-              <Label>Role</Label>
-              <Input placeholder="Nurse / Doctor" />
-            </div>
-
-            <div>
-              <Label>Password</Label>
-              <Input type="password" />
-            </div>
-
-            <div>
-              <Label>Confirm Password</Label>
-              <Input type="password" />
-            </div>
-
-            <Button
-              onClick={() => router.push("/login")}
-              className="w-full bg-sky-600 hover:bg-sky-700"
-            >
-              Create Account
-            </Button>
-
-            <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <a href="/login" className="text-sky-600 font-medium">
-                Login
-              </a>
-            </p>
-          </div>
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Already have an account?{" "}
+            <a href="/login" className="text-sky-600 font-medium">
+              Login
+            </a>
+          </p>
         </div>
       </div>
     </div>

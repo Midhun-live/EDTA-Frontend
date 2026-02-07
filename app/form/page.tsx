@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/lib/auth";
+import { isAuthenticated } from "../../lib/auth";
 import DischargeAssessmentForm from "@/components/DischargeAssessmentForm";
 
 export default function FormPage() {
@@ -12,7 +12,7 @@ export default function FormPage() {
     if (!isAuthenticated()) {
       router.replace("/login");
     }
-  }, []);
+  }, [router]);
 
   return <DischargeAssessmentForm />;
 }

@@ -1,41 +1,56 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { login } from "@/lib/auth";
-import { apiFetch } from "@/lib/api";
+import { useState } from "react";
 
 export default function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
 
-    const res = await apiFetch("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({
-        email: form.get("email"),
-        password: form.get("password"),
-      }),
-    });
+    try {
+      const res = await apiFetch("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({
+          email: form.get("email"),
+          password: form.get("password"),
+        }),
+      });
 
-    localStorage.setItem("access_token", res.access_token);
-    router.push("/home");
+      localStorage.setItem("access_token", res.access_token);
+      router.push("/home");
+    } catch {
+      setError("Invalid email or password");
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md space-y-4">
-      <input name="email" type="email" placeholder="Email" required />
-      <input name="password" type="password" placeholder="Password" required />
-      <button>Login</button>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex flex-col gap-2">
+        <Label>Email</Label>
+        <Input name="email" type="email" required />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label>Password</Label>
+        <Input name="password" type="password" required />
+      </div>
+
+      {error && <p className="text-sm text-red-500">{error}</p>}
+
+      <Button
+        type="submit"
+        className="w-full bg-sky-600 hover:bg-sky-700"
+      >
+        Login
+      </Button>
     </form>
   );
 }

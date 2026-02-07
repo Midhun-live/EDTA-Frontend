@@ -1,21 +1,18 @@
-export const DUMMY_USER = {
-  email: "doctor@eldersmiles.com",
-  password: "password123",
-};
+// lib/auth.ts
 
-export function login(email: string, password: string) {
-  if (email === DUMMY_USER.email && password === DUMMY_USER.password) {
-    localStorage.setItem("auth", "true");
-    return true;
-  }
-  return false;
+export function setToken(token: string) {
+  localStorage.setItem("access_token", token);
+}
+
+export function getToken() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("access_token");
 }
 
 export function isAuthenticated() {
-  if (typeof window === "undefined") return false;
-  return localStorage.getItem("auth") === "true";
+  return !!getToken();
 }
 
 export function logout() {
-  localStorage.removeItem("auth");
+  localStorage.removeItem("access_token");
 }
