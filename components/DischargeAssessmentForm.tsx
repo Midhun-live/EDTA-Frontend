@@ -80,7 +80,7 @@ export default function DischargeAssessmentForm() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl p-6">
+    <div className="mx-auto max-w-3xl p-6 bg-sky-50 rounded-xl">
       <div className="text-center space-y-2 mb-6">
         {!result ? (
           <>
@@ -105,7 +105,7 @@ export default function DischargeAssessmentForm() {
       {!result &&
         <form onSubmit={handleSubmit} className="space-y-10">
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold border-b pb-2">
+            <h2 className="text-lg font-semibold border-b border-blue-200 pb-2 text-blue-700">
               Patient Details
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -164,7 +164,7 @@ export default function DischargeAssessmentForm() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold border-b pb-2">
+            <h2 className="text-lg font-semibold border-b border-blue-200 pb-2 text-blue-700">
               Respiratory Status
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -381,7 +381,7 @@ export default function DischargeAssessmentForm() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold border-b pb-2">
+            <h2 className="text-lg font-semibold border-b border-blue-200 pb-2 text-blue-700">
               Mobility & Transfers
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -411,7 +411,7 @@ export default function DischargeAssessmentForm() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold border-b pb-2">
+            <h2 className="text-lg font-semibold border-b border-blue-200 pb-2 text-blue-700">
               Pressure Injury Risk
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -475,7 +475,7 @@ export default function DischargeAssessmentForm() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold border-b pb-2">
+            <h2 className="text-lg font-semibold border-b border-blue-200 pb-2 text-blue-700">
               Feeding & Swallowing
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -504,7 +504,7 @@ export default function DischargeAssessmentForm() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold border-b pb-2">
+            <h2 className="text-lg font-semibold border-b border-blue-200 pb-2 text-blue-700">
               Cognitive / Supervision Needs
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -563,7 +563,7 @@ export default function DischargeAssessmentForm() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold border-b pb-2">
+            <h2 className="text-lg font-semibold border-b border-blue-200 pb-2 text-blue-700">
               Elimination & Toileting
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -600,7 +600,7 @@ export default function DischargeAssessmentForm() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold border-b pb-2">
+            <h2 className="text-lg font-semibold border-b border-blue-200 pb-2 text-blue-700">
               Wounds & Nursing Needs
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -635,7 +635,7 @@ export default function DischargeAssessmentForm() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold border-b pb-2">
+            <h2 className="text-lg font-semibold border-b border-blue-200 pb-2 text-blue-700">
               Home Environment
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -692,7 +692,10 @@ export default function DischargeAssessmentForm() {
             </div>
           </section>
 
-          <Button className="w-full" type="submit">
+          <Button
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            type="submit"
+          >
             Submit
           </Button>
         </form>
