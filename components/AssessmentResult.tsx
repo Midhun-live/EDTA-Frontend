@@ -4,9 +4,8 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
 
-import { Label } from "./ui/label";
-import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
 
 /* ================= TYPES ================= */
 
@@ -35,7 +34,6 @@ type Props = {
 
 function formatDate(dateStr?: string) {
   if (!dateStr) return "-";
-
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return "-";
 
@@ -60,26 +58,19 @@ export default function AssessmentResult({
   assessment,
   showActions = true,
 }: Props) {
+  const pdfRef = useRef<HTMLDivElement>(null);
+
   const patient = assessment.patient || {};
   const output = assessment.output || {};
-
-  const pdfRef = useRef<HTMLDivElement>(null);
 
   /* ================= ACTIONS ================= */
 
   function shareLink() {
     const shareId = crypto.randomUUID().slice(0, 8);
 
-    const payload = {
-      assessment_id: assessment.assessment_id,
-      patient: assessment.patient,
-      created_at: assessment.created_at,
-      output: assessment.output,
-    };
-
     localStorage.setItem(
       `shared_assessment_${shareId}`,
-      JSON.stringify(payload)
+      JSON.stringify(assessment)
     );
 
     const url = `${window.location.origin}/share?id=${shareId}`;
@@ -92,31 +83,16 @@ export default function AssessmentResult({
 
     const canvas = await html2canvas(pdfRef.current, {
       scale: 2,
+      backgroundColor: "#f8fafc", // light blue-gray
       useCORS: true,
-      backgroundColor: "#ffffff",
-
-      // 🔒 FIX lab() / oklab() CRASH
-      onclone: (clonedDoc) => {
-        const elements =
-          clonedDoc.querySelectorAll<HTMLElement>("*");
-
-        elements.forEach((el) => {
+      onclone: (doc) => {
+        doc.querySelectorAll("*").forEach((el: any) => {
           const style = getComputedStyle(el);
-
-          if (style.color.includes("lab")) {
-            el.style.color = "#000000";
-          }
-
-          if (
-            style.backgroundColor.includes("lab") ||
-            style.backgroundColor.includes("oklab")
-          ) {
+          if (style.color.includes("lab")) el.style.color = "#0f172a";
+          if (style.backgroundColor.includes("lab"))
             el.style.backgroundColor = "#ffffff";
-          }
-
-          if (style.borderColor.includes("lab")) {
-            el.style.borderColor = "#e5e7eb";
-          }
+          if (style.borderColor.includes("lab"))
+            el.style.borderColor = "#cbd5e1";
         });
       },
     });
@@ -125,22 +101,9 @@ export default function AssessmentResult({
 
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    const margin = 10;
-    const imgWidth = pdfWidth - margin * 2;
-    const imgHeight =
-      (canvas.height * imgWidth) / canvas.width;
-
-    pdf.addImage(
-      imgData,
-      "PNG",
-      margin,
-      margin,
-      imgWidth,
-      imgHeight
-    );
-
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight);
     pdf.save("assessment.pdf");
   }
 
@@ -148,13 +111,13 @@ export default function AssessmentResult({
 
   return (
     <div className="space-y-8">
-      {/* ================= ACTION BAR ================= */}
+      {/* ACTION BAR */}
       {showActions && (
         <div className="flex justify-end gap-3">
           <Button variant="outline" onClick={shareLink}>
             Share Link
           </Button>
-          <Button variant="outline" onClick={downloadPDF}>
+          <Button onClick={downloadPDF} className="bg-sky-600 hover:bg-sky-700">
             Download PDF
           </Button>
         </div>
@@ -163,38 +126,38 @@ export default function AssessmentResult({
       {/* ================= PDF CONTENT ================= */}
       <div
         ref={pdfRef}
-        className="space-y-8 bg-white"
-        style={{
-          width: "794px", // A4 width @ 96dpi
-          padding: "32px",
-          margin: "0 auto",
-        }}
+        className="bg-slate-50 p-10 rounded-xl space-y-8"
+        style={{ width: "794px", margin: "0 auto" }}
       >
-        {/* ================= PATIENT SUMMARY ================= */}
-        <div className="bg-white border-l-4 border-blue-600 rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold mb-4">
+        {/* HEADER */}
+        <div>
+          <h1 className="text-2xl font-bold text-sky-700">
+            Equipment Recommendation Report
+          </h1>
+          <p className="text-sm text-slate-600">
+            Eldersmiles Discharge Triage Assessment
+          </p>
+        </div>
+
+        {/* PATIENT SUMMARY */}
+        <div className="bg-white border-l-4 border-sky-600 rounded-xl p-6 shadow-sm">
+          <h2 className="font-semibold text-slate-800 mb-4">
             Patient Summary
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm">
+          <div className="grid grid-cols-3 gap-6 text-sm">
             <div>
-              <p className="text-muted-foreground">Name</p>
-              <p className="font-medium text-base">
-                {patient.name || "-"}
-              </p>
+              <p className="text-slate-500">Name</p>
+              <p className="font-medium">{patient.name || "-"}</p>
             </div>
-
             <div>
-              <p className="text-muted-foreground">Age</p>
+              <p className="text-slate-500">Age</p>
               <p className="font-medium">
                 {patient.age ? `${patient.age} years` : "-"}
               </p>
             </div>
-
             <div>
-              <p className="text-muted-foreground">
-                Discharge Date
-              </p>
+              <p className="text-slate-500">Discharge Date</p>
               <p className="font-medium">
                 {formatDate(patient.discharge_date)}
               </p>
@@ -202,69 +165,58 @@ export default function AssessmentResult({
           </div>
         </div>
 
-        {/* ================= CARE SECTIONS ================= */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {Object.entries(output).map(
-            ([sectionName, section]) => {
-              const equipment = section.equipment || [];
-              const care =
-                section.care_instructions || [];
+        {/* CARE SECTIONS */}
+        <div className="grid grid-cols-2 gap-6">
+          {Object.entries(output).map(([sectionName, section]) => {
+            const equipment = section.equipment || [];
+            const care = section.care_instructions || [];
 
-              if (!equipment.length && !care.length)
-                return null;
+            if (!equipment.length && !care.length) return null;
 
-              return (
-                <div
-                  key={sectionName}
-                  className="bg-white rounded-lg border shadow-sm p-5 space-y-4"
-                >
-                  <Label className="text-sm font-semibold capitalize">
-                    {sectionName.replace(/_/g, " ")}
-                  </Label>
+            return (
+              <div
+                key={sectionName}
+                className="bg-white rounded-lg border border-slate-200 p-5 shadow-sm"
+              >
+                <h3 className="font-semibold text-slate-800 capitalize mb-3">
+                  {sectionName.replace(/_/g, " ")}
+                </h3>
 
-                  {equipment.length > 0 && (
-                    <div>
-                      <Separator className="mb-2" />
-                      <p className="text-xs font-medium text-muted-foreground mb-1">
-                        Equipment
-                      </p>
-                      <ul className="space-y-1 text-sm">
-                        {equipment.map((item, i) => (
-                          <li
-                            key={i}
-                            className="flex gap-2"
-                          >
-                            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                {equipment.length > 0 && (
+                  <>
+                    <p className="text-xs font-medium text-slate-500 mb-1">
+                      Equipment
+                    </p>
+                    <ul className="text-sm space-y-1 mb-3">
+                      {equipment.map((item, i) => (
+                        <li key={i} className="flex gap-2">
+                          <span className="text-emerald-600">●</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
 
-                  {care.length > 0 && (
-                    <div>
-                      <Separator className="mb-2" />
-                      <p className="text-xs font-medium text-muted-foreground mb-1">
-                        Care Instructions
-                      </p>
-                      <ul className="space-y-1 text-sm">
-                        {care.map((inst, i) => (
-                          <li
-                            key={i}
-                            className="flex gap-2"
-                          >
-                            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-500" />
-                            <span>{inst}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              );
-            }
-          )}
+                {care.length > 0 && (
+                  <>
+                    <Separator className="my-2" />
+                    <p className="text-xs font-medium text-slate-500 mb-1">
+                      Care Instructions
+                    </p>
+                    <ul className="text-sm space-y-1">
+                      {care.map((item, i) => (
+                        <li key={i} className="flex gap-2">
+                          <span className="text-sky-600">●</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
