@@ -9,7 +9,7 @@ export default function LoginPage() {
       <div className="hidden lg:flex flex-col justify-center px-16 bg-gradient-to-b from-blue-600 to-blue-700 text-white">
         <h1 className="text-4xl font-bold mb-4">Eldersmiles</h1>
         <p className="text-lg max-w-md">
-          AI-powered discharge triage assistant to ensure safe and
+  Discharge triage assistant to ensure safe and
           well-prepared patient transitions.
         </p>
       </div>
