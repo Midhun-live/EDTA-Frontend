@@ -33,6 +33,11 @@ export default function LoginPage() {
               Sign up
             </a>
           </p>
+          <p className="text-center text-muted-foreground">
+            <a href="/forgot-password" className="text-sky-600 text-sm">
+              Forgot password?
+            </a>
+          </p>
         </div>
       </div>
     </div>
