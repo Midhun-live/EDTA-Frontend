@@ -24,7 +24,7 @@ export default function LoginForm() {
         }),
       });
 
-      localStorage.setItem("access_token", res.access_token);
+      document.cookie = `access_token=${res.access_token}; path=/; SameSite=Lax`;
       router.push("/home");
     } catch {
       setError("Invalid email or password");

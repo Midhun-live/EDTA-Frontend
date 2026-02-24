@@ -40,7 +40,7 @@ export default function SignupForm() {
       });
 
       // ✅ Auto-login after signup
-      localStorage.setItem("access_token", res.access_token);
+      document.cookie = `access_token=${res.access_token}; path=/; SameSite=Lax`;
 
       router.push("/home");
     } catch (err) {

@@ -3,6 +3,7 @@
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
@@ -59,6 +60,7 @@ export default function AssessmentResult({
   showActions = true,
 }: Props) {
   const pdfRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const patient = assessment.patient || {};
   const output = assessment.output || {};
@@ -83,18 +85,8 @@ export default function AssessmentResult({
 
     const canvas = await html2canvas(pdfRef.current, {
       scale: 2,
-      backgroundColor: "#f8fafc", // light blue-gray
+      backgroundColor: "#f8fafc",
       useCORS: true,
-      onclone: (doc) => {
-        doc.querySelectorAll("*").forEach((el: any) => {
-          const style = getComputedStyle(el);
-          if (style.color.includes("lab")) el.style.color = "#0f172a";
-          if (style.backgroundColor.includes("lab"))
-            el.style.backgroundColor = "#ffffff";
-          if (style.borderColor.includes("lab"))
-            el.style.borderColor = "#cbd5e1";
-        });
-      },
     });
 
     const imgData = canvas.toDataURL("image/png");
@@ -113,13 +105,28 @@ export default function AssessmentResult({
     <div className="space-y-8">
       {/* ACTION BAR */}
       {showActions && (
-        <div className="flex justify-end gap-3">
-          <Button variant="outline" onClick={shareLink}>
-            Share Link
+        <div className="flex justify-between items-center">
+          {/* Back Button */}
+          <Button
+            variant="outline"
+            onClick={() => router.push("/home")}
+          >
+            ← Back to Home
           </Button>
-          <Button onClick={downloadPDF} className="bg-sky-600 hover:bg-sky-700">
-            Download PDF
-          </Button>
+
+          {/* Right Side Actions */}
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={shareLink}>
+              Share Link
+            </Button>
+
+            <Button
+              onClick={downloadPDF}
+              className="bg-sky-600 hover:bg-sky-700"
+            >
+              Download PDF
+            </Button>
+          </div>
         </div>
       )}
 

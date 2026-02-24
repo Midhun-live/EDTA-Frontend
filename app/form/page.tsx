@@ -8,11 +8,11 @@ import DischargeAssessmentForm from "@/components/DischargeAssessmentForm";
 export default function FormPage() {
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.replace("/login");
-    }
-  }, [router]);
+  // useEffect(() => {
+  //   if (!isAuthenticated()) {
+  //     router.replace("/login");
+  //   }
+  // }, [router]);
 
   return <DischargeAssessmentForm />;
 }
