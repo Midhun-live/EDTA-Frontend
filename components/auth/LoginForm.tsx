@@ -10,12 +10,15 @@ import { useState } from "react";
 export default function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [remember, setRemember] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
 
     try {
+      setLoading(true);
       const res = await apiFetch("/auth/login", {
         method: "POST",
         body: JSON.stringify({
@@ -24,16 +27,17 @@ export default function LoginForm() {
         }),
       });
 
-      const rememberMe = form.get("rememberMe") === "on";
-      import("@/lib/auth").then(({ setToken }) => {
-        setToken(res.access_token, rememberMe);
-      });
+      if (remember) {
+        localStorage.setItem("access_token", res.access_token);
+      } else {
+        sessionStorage.setItem("access_token", res.access_token);
+      }
 
-      // Optionally set cookie if needed by next.js, but user only mentioned local/session storages.
-      document.cookie = `access_token=${res.access_token}; path=/; SameSite=Lax`;
       router.replace("/home");
     } catch {
       setError("Invalid email or password");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -41,26 +45,33 @@ export default function LoginForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex flex-col gap-2">
         <Label>Email</Label>
-        <Input name="email" type="email" required />
+        <Input name="email" type="email" autoComplete="email" required />
       </div>
 
       <div className="flex flex-col gap-2">
         <Label>Password</Label>
-        <Input name="password" type="password" required />
+        <Input name="password" type="password" autoComplete="current-password" required />
       </div>
 
       <div className="flex items-center gap-2">
-        <input type="checkbox" id="rememberMe" name="rememberMe" className="w-4 h-4" />
-        <Label htmlFor="rememberMe" className="text-sm cursor-pointer">Remember Me</Label>
+        <input
+          type="checkbox"
+          id="remember"
+          checked={remember}
+          onChange={(e) => setRemember(e.target.checked)}
+          className="w-4 h-4"
+        />
+        <Label htmlFor="remember" className="text-sm cursor-pointer">Remember me</Label>
       </div>
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <Button
         type="submit"
+        disabled={loading}
         className="w-full bg-sky-600 hover:bg-sky-700"
       >
-        Login
+        {loading ? "Loading..." : "Login"}
       </Button>
     </form>
   );

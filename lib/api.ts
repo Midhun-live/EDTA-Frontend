@@ -22,7 +22,7 @@ export async function apiFetch(
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw err;
+    throw new Error(err.detail || "Something went wrong");
   }
 
   return response.json();

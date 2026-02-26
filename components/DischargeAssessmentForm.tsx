@@ -18,6 +18,7 @@ import AssessmentResult from "./AssessmentResult";
 
 export default function DischargeAssessmentForm() {
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [initialValues, setInitialValues] = useState({
     patient_name: "",
     age: "",
@@ -67,15 +68,18 @@ export default function DischargeAssessmentForm() {
     console.log("Payload:", initialValues);
 
     try {
+      setLoading(true);
       const response = await apiFetch("/assessments", {
         method: "POST",
         body: JSON.stringify(initialValues),
       });
 
       setResult(response);
-    console.log("response", response);
+      console.log("response", response);
     } catch (error) {
       console.error("Assessment submission failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -695,8 +699,9 @@ export default function DischargeAssessmentForm() {
           <Button
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
             type="submit"
+            disabled={loading}
           >
-            Submit
+            {loading ? "Submitting..." : "Submit"}
           </Button>
         </form>
       }
