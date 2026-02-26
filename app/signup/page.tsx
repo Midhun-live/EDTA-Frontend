@@ -1,8 +1,19 @@
 "use client";
 
 import SignupForm from "@/components/auth/SignupForm";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { isAuthenticated } from "@/lib/auth";
 
 export default function SignupPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      router.replace("/home");
+    }
+  }, [router]);
+
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
       {/* LEFT */}

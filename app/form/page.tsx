@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { isAuthenticated } from "../../lib/auth";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import DischargeAssessmentForm from "@/components/DischargeAssessmentForm";
+import LogoutButton from "@/components/auth/LogoutButton";
 
 export default function FormPage() {
-  const router = useRouter();
-
-  // useEffect(() => {
-  //   if (!isAuthenticated()) {
-  //     router.replace("/login");
-  //   }
-  // }, [router]);
-
-  return <DischargeAssessmentForm />;
+  return (
+    <ProtectedRoute>
+      <div className="relative min-h-screen">
+        <div className="absolute top-4 right-4 z-10">
+          <LogoutButton />
+        </div>
+        <DischargeAssessmentForm />
+      </div>
+    </ProtectedRoute>
+  );
 }

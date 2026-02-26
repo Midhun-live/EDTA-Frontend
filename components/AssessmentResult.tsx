@@ -43,10 +43,10 @@ function formatDate(dateStr?: string) {
     day % 10 === 1 && day !== 11
       ? "st"
       : day % 10 === 2 && day !== 12
-      ? "nd"
-      : day % 10 === 3 && day !== 13
-      ? "rd"
-      : "th";
+        ? "nd"
+        : day % 10 === 3 && day !== 13
+          ? "rd"
+          : "th";
 
   return `${day}${suffix} ${date.toLocaleString("en-US", {
     month: "long",
@@ -105,15 +105,7 @@ export default function AssessmentResult({
     <div className="space-y-8">
       {/* ACTION BAR */}
       {showActions && (
-        <div className="flex justify-between items-center">
-          {/* Back Button */}
-          <Button
-            variant="outline"
-            onClick={() => router.push("/home")}
-          >
-            ← Back to Home
-          </Button>
-
+        <div className="flex justify-end items-center">
           {/* Right Side Actions */}
           <div className="flex gap-3">
             <Button variant="outline" onClick={shareLink}>

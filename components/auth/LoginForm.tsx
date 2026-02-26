@@ -24,8 +24,14 @@ export default function LoginForm() {
         }),
       });
 
+      const rememberMe = form.get("rememberMe") === "on";
+      import("@/lib/auth").then(({ setToken }) => {
+        setToken(res.access_token, rememberMe);
+      });
+
+      // Optionally set cookie if needed by next.js, but user only mentioned local/session storages.
       document.cookie = `access_token=${res.access_token}; path=/; SameSite=Lax`;
-      router.push("/home");
+      router.replace("/home");
     } catch {
       setError("Invalid email or password");
     }
@@ -41,6 +47,11 @@ export default function LoginForm() {
       <div className="flex flex-col gap-2">
         <Label>Password</Label>
         <Input name="password" type="password" required />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input type="checkbox" id="rememberMe" name="rememberMe" className="w-4 h-4" />
+        <Label htmlFor="rememberMe" className="text-sm cursor-pointer">Remember Me</Label>
       </div>
 
       {error && <p className="text-sm text-red-500">{error}</p>}
