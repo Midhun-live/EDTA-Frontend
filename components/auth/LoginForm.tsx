@@ -15,15 +15,18 @@ export default function LoginForm() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = new FormData(e.currentTarget);
+
+    const target = e.currentTarget;
+    const email = target.email.value;
+    const password = target.password.value;
 
     try {
       setLoading(true);
       const res = await apiFetch("/auth/login", {
         method: "POST",
         body: JSON.stringify({
-          email: form.get("email"),
-          password: form.get("password"),
+          email,
+          password,
         }),
       });
 
@@ -33,7 +36,7 @@ export default function LoginForm() {
         sessionStorage.setItem("access_token", res.access_token);
       }
 
-      router.replace("/home");
+      router.push("/home");
     } catch {
       setError("Invalid email or password");
     } finally {
