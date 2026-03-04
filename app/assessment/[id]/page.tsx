@@ -22,6 +22,7 @@ export default function AssessmentDetailPage() {
             try {
                 const id = params.id;
                 const data = await apiFetch(`/assessments/${id}`);
+                console.log("Assessment fetched:", data);
                 setAssessment(data);
             } catch (err) {
                 console.error("Failed to fetch assessment", err);

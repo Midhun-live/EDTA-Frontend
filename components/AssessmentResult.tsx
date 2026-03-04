@@ -1,8 +1,5 @@
 "use client";
 
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import { useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "./ui/button";
@@ -17,6 +14,7 @@ type Section = {
 
 type Assessment = {
   assessment_id?: string;
+  share_token?: string;
   patient?: {
     name?: string;
     age?: number;
@@ -59,7 +57,6 @@ export default function AssessmentResult({
   assessment,
   showActions = true,
 }: Props) {
-  const pdfRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   const patient = assessment.patient || {};
@@ -67,36 +64,36 @@ export default function AssessmentResult({
 
   /* ================= ACTIONS ================= */
 
-  function shareLink() {
-    const shareId = crypto.randomUUID().slice(0, 8);
+  async function shareLink() {
+    if (!assessment?.share_token) {
+      alert("Share link not available.");
+      return;
+    }
 
-    localStorage.setItem(
-      `shared_assessment_${shareId}`,
-      JSON.stringify(assessment)
-    );
+    const url = `${window.location.origin}/share/${assessment.share_token}`;
 
-    const url = `${window.location.origin}/share?id=${shareId}`;
-    navigator.clipboard.writeText(url);
-    alert("Shareable link copied");
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "Assessment Report",
+          url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        alert("Share link copied to clipboard");
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  async function downloadPDF() {
-    if (!pdfRef.current) return;
+  function downloadPDF() {
+    if (!assessment?.assessment_id) return;
 
-    const canvas = await html2canvas(pdfRef.current, {
-      scale: 2,
-      backgroundColor: "#f8fafc",
-      useCORS: true,
-    });
-
-    const imgData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight);
-    pdf.save("assessment.pdf");
+    window.open(
+      `${process.env.NEXT_PUBLIC_API_URL}/assessments/${assessment.assessment_id}/pdf`,
+      "_blank"
+    );
   }
 
   /* ================= UI ================= */
@@ -124,7 +121,7 @@ export default function AssessmentResult({
 
       {/* ================= PDF CONTENT ================= */}
       <div
-        ref={pdfRef}
+        id="assessment-container"
         className="bg-slate-50 p-10 rounded-xl space-y-8"
         style={{ width: "794px", margin: "0 auto" }}
       >
