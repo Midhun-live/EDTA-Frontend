@@ -24,6 +24,7 @@ export default function DischargeAssessmentForm() {
     age: "",
     contact_number: "",
     discharge_date: "",
+    remarks: "",
 
     respiratory: {
       spo2_category: "",
@@ -160,6 +161,21 @@ export default function DischargeAssessmentForm() {
                     setInitialValues((p) => ({
                       ...p,
                       discharge_date: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="flex flex-col gap-2 md:col-span-2">
+                <Label>Remarks</Label>
+                <textarea
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                  placeholder="Enter additional remarks"
+                  value={initialValues.remarks}
+                  onChange={(e) =>
+                    setInitialValues((p) => ({
+                      ...p,
+                      remarks: e.target.value,
                     }))
                   }
                 />

@@ -19,7 +19,9 @@ type Assessment = {
   patient?: {
     name?: string;
     age?: number;
+    contact_number?: string;
     discharge_date?: string;
+    remarks?: string;
   };
   created_at?: string;
   output?: Record<string, Section>;
@@ -163,7 +165,7 @@ export default function AssessmentResult({
               Patient Summary
             </h2>
 
-            <div className="grid grid-cols-3 gap-6 text-sm">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm mb-4">
               <div>
                 <p className="text-slate-500">Name</p>
                 <p className="font-medium">{patient.name || "-"}</p>
@@ -175,12 +177,25 @@ export default function AssessmentResult({
                 </p>
               </div>
               <div>
-                <p className="text-slate-500">Discharge Date</p>
+                <p className="text-slate-500">Contact Number</p>
+                <p className="font-medium">{patient.contact_number || "-"}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Delivery Date</p>
                 <p className="font-medium">
                   {formatDate(patient.discharge_date)}
                 </p>
               </div>
             </div>
+
+            {/* REMARKS */}
+            {patient.remarks && (
+              <div className="pt-4 border-t border-slate-100 text-sm">
+                <p className="text-slate-500 mb-1">Remarks</p>
+                <p className="font-medium whitespace-pre-wrap">{patient.remarks}</p>
+              </div>
+            )}
+
           </div>
 
           {/* CARE SECTIONS */}
