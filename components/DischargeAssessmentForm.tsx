@@ -19,6 +19,7 @@ import AssessmentResult from "./AssessmentResult";
 export default function DischargeAssessmentForm() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [initialValues, setInitialValues] = useState({
     patient_name: "",
     age: "",
@@ -65,6 +66,29 @@ export default function DischargeAssessmentForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const newErrors: Record<string, boolean> = {
+      patient_name: !initialValues.patient_name,
+      age: !initialValues.age,
+      contact_number: !initialValues.contact_number,
+      discharge_date: !initialValues.discharge_date,
+      "mobility.status": !initialValues.mobility.status,
+      "feeding.method": !initialValues.feeding.method,
+      "cognitive.caregiver_availability": !initialValues.cognitive.caregiver_availability,
+      "home_environment.layout": !initialValues.home_environment.layout,
+    };
+
+    setErrors(newErrors);
+
+    const firstInvalidField = Object.keys(newErrors).find((key) => newErrors[key]);
+
+    if (firstInvalidField) {
+      const element = document.getElementById(`field-${firstInvalidField}`);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      return;
+    }
 
     console.log("Payload:", initialValues);
 
@@ -114,56 +138,68 @@ export default function DischargeAssessmentForm() {
               Patient Details
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2" id="field-patient_name">
                 <Label>Patient name</Label>
                 <Input
+                  className={errors.patient_name ? "border-red-500" : ""}
                   value={initialValues.patient_name}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    setErrors((prev) => ({ ...prev, patient_name: false }));
                     setInitialValues((p) => ({
                       ...p,
                       patient_name: e.target.value,
-                    }))
-                  }
+                    }));
+                  }}
                 />
+                {errors.patient_name && <span className="text-sm text-red-500">Required field</span>}
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2" id="field-age">
                 <Label>Age</Label>
                 <Input
                   type="number"
+                  className={errors.age ? "border-red-500" : ""}
                   value={initialValues.age}
-                  onChange={(e) =>
-                    setInitialValues((p) => ({ ...p, age: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    setErrors((prev) => ({ ...prev, age: false }));
+                    setInitialValues((p) => ({ ...p, age: e.target.value }));
+                  }}
                 />
+                {errors.age && <span className="text-sm text-red-500">Required field</span>}
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2" id="field-contact_number">
                 <Label>Contact Number</Label>
                 <Input
                   type="number"
+                  className={errors.contact_number ? "border-red-500" : ""}
                   value={initialValues.contact_number}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    setErrors((prev) => ({ ...prev, contact_number: false }));
                     setInitialValues((p) => ({
                       ...p,
                       contact_number: e.target.value,
-                    }))
-                  }
+                    }));
+                  }}
                 />
+                {errors.contact_number && <span className="text-sm text-red-500">Required field</span>}
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2" id="field-discharge_date">
                 <Label>Delivery Date</Label>
                 <Input
                   type="date"
+                  className={errors.discharge_date ? "border-red-500" : ""}
                   value={initialValues.discharge_date}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    setErrors((prev) => ({ ...prev, discharge_date: false }));
                     setInitialValues((p) => ({
                       ...p,
                       discharge_date: e.target.value,
-                    }))
-                  }
+                    }));
+                  }}
                 />
+                {errors.discharge_date && <span className="text-sm text-red-500">Required field</span>}
               </div>
 
               <div className="flex flex-col gap-2 md:col-span-2">
@@ -405,18 +441,19 @@ export default function DischargeAssessmentForm() {
               Mobility & Transfers
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2" id="field-mobility.status">
                 <Label>Mobility Status</Label>
                 <Select
                   value={initialValues.mobility.status || ""}
-                  onValueChange={(value) =>
+                  onValueChange={(value) => {
+                    setErrors((prev) => ({ ...prev, "mobility.status": false }));
                     setInitialValues((prev) => ({
                       ...prev,
                       mobility: { ...prev.mobility, status: value as MobilityStatus },
-                    }))
-                  }
+                    }));
+                  }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={errors["mobility.status"] ? "border-red-500" : ""}>
                     <SelectValue placeholder="Select mobility status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -426,6 +463,7 @@ export default function DischargeAssessmentForm() {
                     <SelectItem value={MobilityStatus.INDEPENDENT}>Independent</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors["mobility.status"] && <span className="text-sm text-red-500">Required field</span>}
               </div>
             </div>
           </section>
@@ -499,18 +537,19 @@ export default function DischargeAssessmentForm() {
               Feeding & Swallowing
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2" id="field-feeding.method">
                 <Label>Feeding Method</Label>
                 <Select
                   value={initialValues.feeding.method}
-                  onValueChange={(value) =>
+                  onValueChange={(value) => {
+                    setErrors((prev) => ({ ...prev, "feeding.method": false }));
                     setInitialValues((prev) => ({
                       ...prev,
                       feeding: { ...prev.feeding, method: value as FeedingMethod },
-                    }))
-                  }
+                    }));
+                  }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={errors["feeding.method"] ? "border-red-500" : ""}>
                     <SelectValue placeholder="Select feeding method" />
                   </SelectTrigger>
                   <SelectContent>
@@ -519,6 +558,7 @@ export default function DischargeAssessmentForm() {
                     <SelectItem value={FeedingMethod.PEG_TUBE}>PEG tube</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors["feeding.method"] && <span className="text-sm text-red-500">Required field</span>}
               </div>
             </div>
           </section>
@@ -528,21 +568,22 @@ export default function DischargeAssessmentForm() {
               Cognitive / Supervision Needs
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2" id="field-cognitive.caregiver_availability">
                 <Label>Caregiver availability</Label>
                 <Select
                   value={initialValues.cognitive.caregiver_availability || ""}
-                  onValueChange={(value) =>
+                  onValueChange={(value) => {
+                    setErrors((prev) => ({ ...prev, "cognitive.caregiver_availability": false }));
                     setInitialValues((prev) => ({
                       ...prev,
                       cognitive: {
                         ...prev.cognitive,
                         caregiver_availability: value as CaregiverAvailability,
                       },
-                    }))
-                  }
+                    }));
+                  }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={errors["cognitive.caregiver_availability"] ? "border-red-500" : ""}>
                     <SelectValue placeholder="Select Caregiver availability" />
                   </SelectTrigger>
                   <SelectContent>
@@ -551,6 +592,7 @@ export default function DischargeAssessmentForm() {
                     <SelectItem value={CaregiverAvailability.NONE}>None</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors["cognitive.caregiver_availability"] && <span className="text-sm text-red-500">Required field</span>}
               </div>
               <div className="flex flex-col gap-2">
                 <Label>Cognitive concerns</Label>
@@ -659,21 +701,22 @@ export default function DischargeAssessmentForm() {
               Home Environment
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2" id="field-home_environment.layout">
                 <Label>Single floor / Multi-floor</Label>
                 <Select
                   value={initialValues.home_environment.layout || ""}
-                  onValueChange={(value) =>
+                  onValueChange={(value) => {
+                    setErrors((prev) => ({ ...prev, "home_environment.layout": false }));
                     setInitialValues((prev) => ({
                       ...prev,
                       home_environment: {
                         ...prev.home_environment,
                         layout: value as HomeLayout,
                       },
-                    }))
-                  }
+                    }));
+                  }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={errors["home_environment.layout"] ? "border-red-500" : ""}>
                     <SelectValue placeholder="Select Floor" />
                   </SelectTrigger>
                   <SelectContent>
@@ -681,6 +724,7 @@ export default function DischargeAssessmentForm() {
                     <SelectItem value={HomeLayout.MULTI_FLOOR}>Multiple Floor</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors["home_environment.layout"] && <span className="text-sm text-red-500">Required field</span>}
               </div>
               <div className="flex flex-col gap-2">
                 <Label>Lift available?</Label>
